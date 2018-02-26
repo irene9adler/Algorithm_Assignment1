@@ -1,0 +1,556 @@
+\documentclass[11pt]{ctexart}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{palatino}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\author{Song Qige 2017E8018661044}
+\title{091M4041H - Assignment 1 \\Algorithm Design and Analysis }
+
+\begin{document}
+  \maketitle
+   \section{determine the median of 2n values(1)}
+     \subsection{Algorithm Description}%第一题
+         \  The problem is to find the median of two databases with n elements.We can separately obtaine the median of database a and the median of database b.If the median of database a is less than the median of database b, then the overall median may only appear in the right interval of a and the left interval of b.If the median of a is greater than or equal to the median of b, then the overall median may only appear in the left interval of a and the right interval of b.So that the range of seeking will continue to shrink.\\
+         \begin{algorithm}
+         \begin{algorithmic}[1] %每行显示行号
+         \Function {findMediaNum}{$database A, beginA, databaseB, beginB, n$}
+                \If {$n == 1$}
+                    \State \Return{$min(A[beginA],B[beginB])$}
+                \EndIf
+                \State $mediumA = A[beginA+n/2-1]$
+                \State $mediumB = B[beginB+n/2-1]$
+                \If {$mediumA < mediumB$}
+                  \State \Call{findMediaNum}{$A,beginA + n/2,B,beginB,n/2$}
+                \Else
+                  \State \Call{findMediaNum}{$A,beginA,B,beginB + n/2,n/2$}
+                \EndIf
+         \EndFunction
+         \end{algorithmic}
+         \end{algorithm}
+       \subsection{subproblem reduction graph}
+         \thispagestyle{empty}
+          % 流程图定义基本形状
+          \tikzstyle{tasknode} = [rectangle, rounded corners, minimum width = 2cm, minimum height=1cm,text centered, draw = black]
+          % 箭头形式
+          \tikzstyle{arrow} = [->,>=stealth]
+          \begin{tikzpicture}[node distance=2cm]
+          %定义流程图具体形状
+          \node[tasknode](n){n};
+          \node[tasknode, below of = n, yshift = -1cm](n/2){n/2};
+          \coordinate (point1) at (-3cm, -6cm);
+          %连接具体形状
+          \draw [arrow] (n) -- (n/2);
+          \end{tikzpicture}
+       \subsection{Prove the correctness}
+         \ Set up two databases are A, B, each containing n elements.If we remove k numbers smaller than the median and k numbers bigger than the median,the median of the resulting sub-array is same as the median of the origin array.Then
+         $$ Medium(A,B)= f(n)_{(A_{0-n},B_{0-n})}=\left\{
+         \begin{array}{rcl}
+         f(n/2)_{(A_{n/2-n},B_{0-n/2})}       &      & {A_{n/2} < B_{n/2}}\\ \\
+         f(n/2)_{(A_{n/2-n},B_{0-n/2})}       &      & {A_{n/2} >= B_{n/2}}
+         \end{array} \right. $$
+       \subsection{time complexity}
+         \ $T(n) = T(n/2) + c = O(log n)$
+
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+       \section{Find the k$^{th}$ largest element in an unsorted array(2)}
+       \subsection{Algorithm Description}%第二题
+         \ Randomly choose element Ai,Comparing the other elements with Ai,if bigger than Ai put into set S+,if smaller put into set S-.If $|S-| = k$–$1$,the result is Ai.If $|S-| > k$–$1$,the problem can be simplified as find the k$^{th}$ largest element in S-.If $|S-|< k$–$1$,the problem can be simplified as find the $(k -| S-|+1)$$^{th}$ largest element in S+.
+
+       \subsection{pseudo-code}
+         \begin{algorithm}
+         \begin{algorithmic}[1] %每行显示行号
+         \Function {FindKthElement}{$A,k$}
+                \State $Randomly \ choose \ Ai$
+                \For{$j = 0 \to n-1$}
+                    \State $put \ A[j] \ in \ S- \ if \ A[j] < A[i]$
+                    \State $put \ A[j] \ in \ S+ \ if \ A[j] > A[i]$
+                \EndFor
+                \If {$|S-| = k $–$ 1$}
+                \State \Return{$Ai$}
+                \Else
+                  \If{$|S-| > k $–$ 1$}
+                    \State \Call{FindKthElement}{$S-,k$}
+                  \EndIf
+                  \State \Call{FindKthElement}{$S-,k - |S-| + 1$}
+                \EndIf
+         \EndFunction
+         \end{algorithmic}
+         \end{algorithm}
+       \subsection{subproblem reduction graph}
+         \ The worst case: \\
+         \thispagestyle{empty}
+          % 流程图定义基本形状
+          \tikzstyle{tasknode} = [rectangle, rounded corners, minimum width = 2cm, minimum height=1cm,text centered, draw = black]
+          % 箭头形式
+          \tikzstyle{arrow} = [->,>=stealth]
+          \begin{tikzpicture}[node distance=2cm]
+          %定义流程图具体形状
+          \node[tasknode](n){n};
+          \node[tasknode, below of = n, yshift = -1cm](n-1){n-1};
+          \coordinate (point1) at (-3cm, -6cm);
+          %连接具体形状
+          \draw [arrow] (n) -- (n-1);
+          \end{tikzpicture}
+          \\
+          \ \ The best case: \\
+         \thispagestyle{empty}
+          % 流程图定义基本形状
+          \tikzstyle{tasknode} = [rectangle, rounded corners, minimum width = 2cm, minimum height=1cm,text centered, draw = black]
+          % 箭头形式
+          \tikzstyle{arrow} = [->,>=stealth]
+          \begin{tikzpicture}[node distance=2cm]
+          %定义流程图具体形状
+          \node[tasknode](n){n};
+          \node[tasknode, below of = n, yshift = -1cm](n/2){n/2};
+          \coordinate (point1) at (-3cm, -6cm);
+          %连接具体形状
+          \draw [arrow] (n) -- (n/2);
+          \end{tikzpicture}
+
+       \subsection{Prove the correctness}
+         $$ f(k)_A=\left\{
+         \begin{array}{rcl}
+         Ai       &      & {|S-|+1 = k}\\ \\
+         f(k)_{S-}       &      & {|S-|+1 > k}\\ \\
+         f(k-|S-|+1)_{S+}       &      & {|S-|+1 < k}
+         \end{array} \right. $$
+       \subsection{time complexity}
+         \ The worst case:Ai is the biggest/smallest element of the array,
+         \ $T(n) = T(n - 1) + cn = O(n^2)$ \\
+         \ The best case:Ai is the median element of the array,
+         \ $T(n) = T(n/2) + cn = O(n)$
+
+         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+             \section{Divide convex polygon into traingles(5)}
+       \subsection{Algorithm Description}%第五题
+         \ Numbering the vertices of the convex polygon from 1 to n,choose the vertice 1,n and any one of vertices 2 to n-1.The 3 vertices choosed can divide the polygon into a polygon of i edges,a traingle and a polygon of n-i+1 edges.The total ways to divide the origin polygon equal to the product of the ways to divide the polygon of i edges and the ways to divide the polygon of n-i+1 edges.
+         To avoid repeat caculation,we can store the ways to divide a polygon of k edges into the k$^{th}$ element of array Walked[].
+
+       \subsection{pseudo-code}
+     \begin{algorithm}
+         \begin{algorithmic}[1] %每行显示行号
+         \State int Walked[N] = {0}
+         \Function {DivideTraingle}{$n$}
+                  \If{$n \le 3$}
+                    \State \Return{$1$}
+                  \EndIf
+                  \If{$Walked[n] != 0$}
+                    \State \Return{$Walked[n]$}
+                  \EndIf
+                \State $int \ count = 0$
+                \For{$i = 2 \to n-1$}
+                    \State $count += DivideTraingle(i) * DivideTraingle(n-i+1)$
+                \EndFor
+                \State $Walked[n] = count$
+         \EndFunction
+         \end{algorithmic}
+         \end{algorithm}
+       \subsection{subproblem reduction graph}
+         \includegraphics[width=4.00in,height=2.40in]{5.jpg}
+       \subsection{Prove the correctness}
+         $$ f(n)=\left\{
+         \begin{array}{rcl}
+         1       &      & {n \le 3}\\ \\
+         \sum_{n=1}^Nf(i)* f(n+1-i)
+         &      & {n>3}
+         \end{array} \right. $$
+       \subsection{time complexity}
+         \ $T(n) = T(n-1) + T(n-2) + T(n-3) +.. +T(2) = O(n-2) + O(n-3) + .. + O(1) = O(n^{2})$
+
+         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+         \section{Sort-and-Count algorithm(8)} %第八题
+         \subsection{8-1 Source code}
+         \lstset{
+    numbers=left,
+    numberstyle= \tiny,
+    keywordstyle= \color{ blue!70},
+    commentstyle= \color{red!50!green!50!blue!50},
+    frame=shadowbox, % 阴影效果
+    rulesepcolor= \color{ red!20!green!20!blue!20} ,
+    escapeinside=``, % 英文分号中可写入中文
+    xleftmargin=2em,xrightmargin=2em, aboveskip=1em,
+    framexleftmargin=2em
+}
+\lstset{language=C}
+\begin{lstlisting}
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <time.h>
+
+using namespace std;
+const int N = 100001;
+
+int num[N];//store the elements need to be sorted
+int tmp[N];//temp array after merge
+long long ans;//number of invertions
+
+void merge_sort(int l,int m,int r)
+{
+    int i = l;
+    int j = m + 1;
+    int k = l;
+    while(i <= m && j <= r)
+    {
+        //i < j,a[i] > a[j]->invertion
+        if(num[i] > num[j])
+        {
+            tmp[k++] = num[j++];
+            //each element after a[i]->invertions
+            ans += m - i + 1;
+        }
+        else
+        {
+            tmp[k++] = num[i++];
+        }
+    }
+
+    while(i <= m) tmp[k++] = num[i++];
+    while(j <= r) tmp[k++] = num[j++];
+
+    for(int i=l;i<=r;i++)
+        num[i] = tmp[i];
+}
+
+void sort_and_count(int l,int r)
+{
+    if(l < r)
+    {
+        int m = (l + r) / 2;
+        sort_and_count(l,m);
+        sort_and_count(m+1,r);
+        merge_sort(l,m,r);
+    }
+}
+
+int main()
+{
+    clock_t start,end;
+    //Read the number from the file line by line
+    ifstream infile;
+    infile.open("8.txt");
+    if(!infile) cout<<"error"<<endl;
+    int t1;
+
+    int len = 0;
+    cout<<"store in the array"<<endl;
+    while(infile>>t1)
+    {
+       num[len] = t1;
+       len++;
+    }
+
+    /*print the array*/
+    int i;
+    for(i=0;i<len;i++)
+        cout<<num[i]<<endl;
+    cout<<endl;
+
+    /*sort the array and count inversions*/
+    ans = 0;
+    start = clock();
+    sort_and_count(0,len-1);
+    end = clock();
+
+    cout << "The number of inversions:" << ans;
+    cout << "time to merge sort and count : " \
+    << (double)(end-start)/CLK_TCK <<endl;
+    return 0;
+}
+
+\end{lstlisting}
+
+         \subsection{8-2 Souce code}
+         \ It's possible to use the Quick-Sort idea. \\
+         source code:
+          \lstset{
+    numbers=left,
+    numberstyle= \tiny,
+    keywordstyle= \color{ blue!70},
+    commentstyle= \color{red!50!green!50!blue!50},
+    frame=shadowbox, % 阴影效果
+    rulesepcolor= \color{ red!20!green!20!blue!20} ,
+    escapeinside=``, % 英文分号中可写入中文
+    xleftmargin=2em,xrightmargin=2em, aboveskip=1em,
+    framexleftmargin=2em
+}
+\lstset{language=C}
+\begin{lstlisting}
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <time.h>
+
+using namespace std;
+
+const int N = 100001;
+long long ans;//number of invertions
+
+void quick_sort_and_count(int *a,int l,int r)
+{
+    int left_num = 0;
+    int right_num = 0;
+
+	/*S- set,store the elements
+    smaller than pivot*/
+    int *left = (int*)calloc(r-l,sizeof(int));
+	/*S+ set,store the elements
+    bigger than pivot*/
+    int *right = (int*)calloc(r-l,sizeof(int));
+
+    int pivot;
+    /*put smaller element into s-,
+	 add the number of s+ now to
+	 the inversion number.
+     after a round,add the number
+     of s- to the inversion number*/
+    if(l < r)
+    {
+        pivot = a[l];
+        int i;
+        for(i = l + 1;i <= r;i++)
+        {
+            if(a[i] < pivot)
+            {
+                left[left_num++] = a[i];
+                ans += right_num;
+            }
+            else
+            {
+                right[right_num++] = a[i];
+            }
+
+        }
+        ans += left_num;
+
+    quick_sort_and_count(left,0,left_num-1);
+    quick_sort_and_count(right,0,right_num-1);
+    }
+}
+
+
+int main()
+{
+    clock_t start,end;
+    //Read the number from the file line by line
+    ifstream infile;
+    infile.open("8.txt");
+    if(!infile) cout<<"error"<<endl;
+    int t1;
+
+    int len = 0;
+    cout<<"store in the array"<<endl;
+    while(infile>>t1)
+    {
+       num[len] = t1;
+       len++;
+    }
+
+    /*print the array*/
+    int i;
+    for(i=0;i<len;i++)
+        cout<<num[i]<<endl;
+    cout<<endl;
+
+    /*sort the array and count inversions*/
+    ans = 0;
+    start = clock();
+    quick_sort_and_count(0,len-1);
+    end = clock();
+
+    cout << "The number of inversions:" << ans;
+    cout << "time to quick sort and count : " \
+    << (double)(end-start)/CLK_TCK <<endl;
+    return 0;
+}
+\end{lstlisting}
+
+         \subsection{8-2 comparing}
+         \ result for merge sort and count: \\
+         \includegraphics[width=4.00in,height=1.50in]{8_1.JPG}
+         \\
+         \ result for quick sort and count: \\
+         \includegraphics[width=4.00in,height=1.50in]{8_2.JPG} \\
+
+
+         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+         \section{the closest pair problem(9)} %第九题
+         \subsection{Source code}
+         \lstset{
+    numbers=left,
+    numberstyle= \tiny,
+    keywordstyle= \color{ blue!70},
+    commentstyle= \color{red!50!green!50!blue!50},
+    frame=shadowbox, % 阴影效果
+    rulesepcolor= \color{ red!20!green!20!blue!20} ,
+    escapeinside=``, % 英文分号中可写入中文
+    xleftmargin=2em,xrightmargin=2em, aboveskip=1em,
+    framexleftmargin=2em
+}
+\lstset{language=C}
+\begin{lstlisting}
+#include <iostream>
+#include <math.h>
+#include <algorithm>
+
+using namespace std;
+typedef struct point//point in the plane
+{
+  double x;
+  double y;
+
+  //sort the points by x coordinate
+  friend bool operator < \
+  (const point &a, const point &b){
+		if(a.x == b.x)
+			return a.y < b.y;
+		return a.x < b.x;
+	}
+}point;
+
+const int N = 100;
+point points[N];
+point a,b;//the closest point pair
+
+//use quick sort to sort the points by y
+void y_QuickSort(point y_sort_points[],\
+  int l,int r)
+{
+    if (l < r)
+    {
+        int i = l, j = r;
+        point x = y_sort_points[l];
+        while (i < j)
+        {
+           while(i < j &&\
+           y_sort_points[j].y>= x.y)
+             j--;
+           if(i < j)
+           y_sort_points[i++] = y_sort_points[j];
+           while(i < j && \
+           y_sort_points[i].y< x.y)
+              i++;
+           if(i < j)
+           y_sort_points[j--] = y_sort_points[i];
+        }
+        y_sort_points[i] = x;
+        y_QuickSort(y_sort_points,l, i - 1);
+        y_QuickSort(y_sort_points,i + 1, r);
+    }
+}
+
+double Distance(point a,point b)
+{
+    return sqrt((a.x - b.x)*(a.x - b.x) \
+    + (a.y - b.y) * (a.y - b.y));
+}
+
+double closest(int l,int r)
+{
+    if(l == r)
+    {
+         a.x = points[l].x;
+		 a.y = points[l].y;
+
+		 b.x = points[r].x;
+		 b.y = points[r].y;
+        return 0;
+    }
+    else if(l == r - 1)
+    {
+         a.x = points[l].x;
+		 a.y = points[l].y;
+
+		 b.x = points[r].x;
+		 b.y = points[r].y;
+
+        return Distance(points[l],points[r]);
+    }
+
+    int m = (l + r)/2;
+	/*caculate the closest pair
+    in left and right*/
+    double res = min(closest(l,m),closest(m,r));
+    double tmp;
+    int i,j;
+    int node_inside_num = 0;
+    point node_inside[N];
+
+    /*store the points in 2d width strip
+    in temp array*/
+    for(i = m - 1; i >= l && \
+    points[m].x - points[i].x < res; i--){
+    node_inside[node_inside_num++] = points[i];
+    }
+
+    for(i = m + 1; i <= r &&\
+    points[m].x - points[i].x < res; i++){
+    node_inside[node_inside_num++] = points[i];
+    }
+
+    //sort the points in 2d width strip by y
+    y_QuickSort(node_inside,0,node_inside_num-1);
+
+	/*for each points in 2d width
+    strip sorted by y,caculate the
+    diatance with 7 points after it,
+    if closer,update the result*/
+    for(i = 0;i < node_inside_num;i++)
+    {
+        int end_inside;
+        if(node_inside_num - i - 1 < 8)
+        end_inside = node_inside_num;
+        else end_inside = i + 8;
+        for(j = i + 1;j < end_inside;j++)
+        {
+            tmp = Distance(node_inside[i], \
+            node_inside[j]);
+            if(tmp < res)
+            {
+               res = tmp;
+               a.x = node_inside[i].x;
+               a.y = node_inside[i].y;
+               b.x = node_inside[j].x;
+               b.y = node_inside[j].y;
+            }
+         }
+      }
+    return res;
+}
+int main()
+{
+    int n;
+    //read the count of points in the plain
+    cin>>n;
+    int i;
+    for(i=0; i<n ; i++){
+        //read the coordinate of the n points
+    	cin>>points[i].x>>points[i].y;
+    }
+
+    //sort the points by x coordinate
+    sort(points,points+n);
+    double result = closest(0,n - 1);
+    cout<<"The closest point pair is:(";
+    cout<<a.x<<","<<a.y<<") ("<<b.x<<","<<b.y;
+    cout<<") the closest distance is:"<<result;
+
+    return 0;
+}
+
+\end{lstlisting}
+         \subsection{result}
+         \ test case for 5 points: \\
+         \includegraphics[width=4.00in,height=2.00in]{9_3.jpg}
+         \\
+         \ test case for 20 points: \\
+         \includegraphics[width=4.00in,height=2.50in]{9_1.jpg} \\
+         \includegraphics[width=4.00in,height=2.50in]{9_2.jpg}
+\end{document}
